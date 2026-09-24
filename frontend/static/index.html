@@ -109,6 +109,8 @@
   .a2divider { border:none; border-top:1px solid var(--border); margin:.5rem 0; width:100%; }
   .a2img { max-width:100%; border-radius:10px; display:block; box-shadow: 0 4px 12px rgba(0,0,0,0.3); }
   .material-symbols-outlined { font-family:'Material Symbols Outlined'; font-size:1.25rem; line-height:1; vertical-align:middle; color:var(--accent-light); }
+  a { color: var(--accent-light); text-decoration: underline; word-break: break-all; transition: color 0.2s ease; }
+  a:hover { color: #6ee7b7; text-decoration: none; }
 </style>
 </head>
 <body>
@@ -149,6 +151,48 @@ const form = document.getElementById("form");
 const input = document.getElementById("input");
 
 function el(tag, cls, text) { const e = document.createElement(tag); if (cls) e.className = cls; if (text != null) e.textContent = text; return e; }
+
+function formatTextWithLinks(container, text) {
+  if (!text) return;
+  const tokenRegex = /(\[(.*?)\]\((https?:\/\/[^\s\)]+)\))|(https?:\/\/[^\s]+)|(www\.[^\s]+)|((?:[a-zA-Z0-9-]+\.)+(?:com|org|net|io|edu|gov|co|app|dev)(?:\/[^\s]*)?)/g;
+  const lines = text.split("\n");
+  lines.forEach((line, lineIdx) => {
+    if (lineIdx > 0) container.appendChild(document.createElement("br"));
+    let lastIdx = 0;
+    let match;
+    tokenRegex.lastIndex = 0;
+    while ((match = tokenRegex.exec(line)) !== null) {
+      if (match.index > lastIdx) {
+        container.appendChild(document.createTextNode(line.slice(lastIdx, match.index)));
+      }
+      let linkText = "";
+      let href = "";
+      if (match[1]) {
+        linkText = match[2];
+        href = match[3];
+      } else if (match[4]) {
+        linkText = match[4];
+        href = match[4];
+      } else if (match[5]) {
+        linkText = match[5];
+        href = "https://" + match[5];
+      } else if (match[6]) {
+        linkText = match[6];
+        href = "https://" + match[6];
+      }
+      const linkEl = document.createElement("a");
+      linkEl.href = href;
+      linkEl.target = "_blank";
+      linkEl.rel = "noopener noreferrer";
+      linkEl.textContent = linkText;
+      container.appendChild(linkEl);
+      lastIdx = tokenRegex.lastIndex;
+    }
+    if (lastIdx < line.length) {
+      container.appendChild(document.createTextNode(line.slice(lastIdx)));
+    }
+  });
+}
 
 function bubble(who) {
   const isAgent = who === "agent";
@@ -219,7 +263,7 @@ function buildNode(id, comps, seen) {
       const hint = String(props.usageHint || "body").toLowerCase();
       if (["h1", "h2", "h3", "h4", "h5", "h6"].includes(hint)) t.classList.add("a2-" + hint);
       else if (hint === "caption") t.classList.add("a2-caption");
-      t.textContent = boundStr(props.text);
+      formatTextWithLinks(t, boundStr(props.text));
       return t;
     }
     case "Divider":
@@ -271,7 +315,11 @@ function renderReply(b, parts) {
   const a2ui = parts.filter(p => p && p.kind === "a2ui" && p.data).map(p => p.data);
 
   const textStr = texts.join("\n").trim();
-  if (textStr) b.appendChild(el("div", null, textStr));
+  if (textStr) {
+    const textDiv = el("div");
+    formatTextWithLinks(textDiv, textStr);
+    b.appendChild(textDiv);
+  }
 
   if (a2ui.length) {
     b.classList.add("rich");
