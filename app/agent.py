@@ -179,7 +179,7 @@ def generate_recipe_image(recipe_title: str, visual_prompt: str = "") -> str:
   <circle cx="300" cy="170" r="90" fill="#334155" stroke="url(#accent)" stroke-width="6"/>
   <text x="300" y="185" font-family="sans-serif" font-size="64" text-anchor="middle" fill="#f59e0b">🍳</text>
   <text x="300" y="310" font-family="sans-serif" font-size="24" font-weight="bold" text-anchor="middle" fill="#ffffff">{recipe_title}</text>
-  <text x="300" y="345" font-family="sans-serif" font-size="14" text-anchor="middle" fill="#94a3b8">Smart Pantry Recipe Concierge</text>
+  <text x="300" y="345" font-family="sans-serif" font-size="14" text-anchor="middle" fill="#94a3b8">ChefGemini</text>
 </svg>"""
 
     storage_client = storage.Client(project=FIRESTORE_PROJECT_ID)
@@ -431,7 +431,7 @@ schema_manager = A2uiSchemaManager(
 
 a2ui_instruction = schema_manager.generate_system_prompt(
     role_description=(
-        "You are Smart Pantry Recipe Concierge, a helpful AI culinary assistant. "
+        "You are ChefGemini, a helpful personal chef and culinary AI. "
         "CRITICAL INSTRUCTION: You MUST pay close attention to any user allergies, dietary restrictions, or food sensitivities mentioned. "
         "Always remember user allergies across conversations using your Memory Bank tools (LoadMemoryTool and PreloadMemoryTool). "
         "When suggesting or recommending recipes, meals, or ingredients, you MUST strictly check for stored user allergies and guarantee that no suggested dish contains forbidden allergens. "
